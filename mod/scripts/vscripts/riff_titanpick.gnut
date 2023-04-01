@@ -1,0 +1,6 @@
+global function Riff_TitanWeaponPick_Init
+
+void function Riff_TitanWeaponPick_Init()
+{
+    AddPrivateMatchModeSettingEnum( "#TITAN_WEAPON_PICKUP", "titan_weapon_drops", [ "Disabled", "Enabled" ], "0" )
+}

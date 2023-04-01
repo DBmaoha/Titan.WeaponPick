@@ -1,0 +1,39 @@
+{
+	"Name": "TitanWeapon Pickups",
+	"Description": "Pickup the weapons dropped by your enemies(or teammates)",
+	"Version": "1.0.0",
+	"LoadPriority": 2,
+    "Scripts": [
+		{
+			"Path": "riff_titanpick.gnut",
+			"RunOn": "( CLIENT || SERVER ) && MP",
+			"ClientCallback": {
+				"Before": "Riff_TitanWeaponPick_Init"
+			},
+			"ServerCallback": {
+                "Before": "Riff_TitanWeaponPick_Init"
+            }
+		},
+		{
+			"Path": "/titanutil/titanpick.nut",
+			"RunOn": "SERVER && MP",
+			"ServerCallback": {
+                "After": "TitanPick_Init"
+            }
+		},
+        {
+			"Path": "/titanutil/titan_replace.gnut",
+			"RunOn": "SERVER && MP",
+			"ServerCallback": {
+                "After": "TitanReplace_Init"
+            }
+		},
+		{
+			"Path": "/titanutil/_titan_loadout_switch.nut",
+			"RunOn": "SERVER && MP",
+			"ServerCallback": {
+                "After": "TitanLoadoutSwitch_Init"
+            }
+		}
+    ]
+}
