@@ -430,7 +430,7 @@ void function TitanReplace_BecomeRonin( entity titan, bool isPickup = false, boo
 			//Titan Core
             if( passiveType == "Core" )
 			{
-				titan.GiveOffhandWeapon( "mp_titancore_shift_core", OFFHAND_EQUIPMENT, ["pas_ronin_swordcore"] )
+				titan.GiveOffhandWeapon( "mp_titancore_shift_core", OFFHAND_EQUIPMENT )
 				GivePassive( titan, ePassives.PAS_RONIN_SWORDCORE )
 			}
 			else
