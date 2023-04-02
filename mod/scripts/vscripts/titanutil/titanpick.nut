@@ -1,9 +1,7 @@
 untyped // almost everything is hardcoded in this file!
 
 global function TitanPick_Init
-global function TitanPick_Enabled_Init
 
-global function TitanPick_EnableWeaponDrops // main settings func
 global function TitanPick_SoulSetEnableWeaponDrop
 global function TitanPick_SoulSetEnableWeaponPick
 
@@ -69,8 +67,6 @@ struct OffhandWeaponData
 
 struct
 {
-    bool enableWeaponDrops = false
-
     table<entity, bool> soulEnabledTitanDrop
     table<entity, bool> soulEnabledTitanPick
     table<entity, string> soulWeaponDropCharcterName // default classes registered in titan_replace.gnut
@@ -88,17 +84,9 @@ void function TitanPick_Init()
 {
     AddCallback_OnPlayerKilled( OnPlayerOrNPCKilled )
     AddCallback_OnNPCKilled( OnPlayerOrNPCKilled )
-}
 
-// main settings
-void function TitanPick_Enabled_Init()
-{
-    TitanPick_EnableWeaponDrops( true )
-}
-
-void function TitanPick_EnableWeaponDrops( bool enable )
-{
-    file.enableWeaponDrops = enable
+    // for updating rui
+    RegisterSignal( "UpdateCockpitRUI" )
 }
 
 void function OnPlayerOrNPCKilled( entity victim, entity attacker,var damageInfo )
@@ -430,6 +418,8 @@ void function ReplaceTitanWeapon( entity player, entity weaponProp )
     weaponProp.Destroy()
 
     // successfully applies weapons
+    // update cockpit rui visibility
+    thread UpdateCockpitRUIVisbilityForWeaponSwitch( player )
 }
 
 void function ApplySavedOffhandWeapons( entity titan, OffhandWeaponData savedOffhands )
@@ -490,6 +480,19 @@ void function ApplySavedOffhandWeapons( entity titan, OffhandWeaponData savedOff
 			titan.SetHealth( min( curHealth, newMaxHealth ) )
         }
     }
+}
+
+void function UpdateCockpitRUIVisbilityForWeaponSwitch( entity player )
+{
+    player.Signal( "UpdateCockpitRUI" )
+    player.EndSignal( "UpdateCockpitRUI" )
+    player.EndSignal( "OnDestroy" )
+    if ( !HasCinematicFlag( player, CE_FLAG_TITAN_3P_CAM ) )
+        AddCinematicFlag( player, CE_FLAG_TITAN_3P_CAM )
+
+    wait 0.5
+    if ( HasCinematicFlag( player, CE_FLAG_TITAN_3P_CAM ) )
+        RemoveCinematicFlag( player, CE_FLAG_TITAN_3P_CAM )
 }
 
 // utility
