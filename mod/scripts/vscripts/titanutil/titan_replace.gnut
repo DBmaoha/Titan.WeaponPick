@@ -165,7 +165,7 @@ void function TitanReplace_BecomeIon( entity titan, bool isPickup = false, bool 
 				entity newWeapon
                 if( passiveType == "Weapon" )
                 {
-                    newWeapon = titan.GiveWeapon ("mp_titanweapon_particle_accelerator", ["pas_ion_weapon"])
+                    newWeapon = titan.GiveWeapon ("mp_titanweapon_particle_accelerator")
                     GivePassive( titan, ePassives.PAS_ION_WEAPON )
                 }
                 else if( passiveType == "Offence" )
@@ -313,7 +313,7 @@ void function TitanReplace_BecomeTone( entity titan, bool isPickup = false, bool
 				//Defence
 				if( passiveType == "Defence" )
 				{
-					titan.GiveOffhandWeapon("mp_titanability_particle_wall", OFFHAND_SPECIAL, ["pas_tone_wall"] )
+					titan.GiveOffhandWeapon("mp_titanability_particle_wall", OFFHAND_SPECIAL )
 					GivePassive( titan, ePassives.PAS_TONE_WALL )
 				}
 				else
@@ -441,7 +441,7 @@ void function TitanReplace_BecomeRonin( entity titan, bool isPickup = false, boo
 				//Tactical
 				if( passiveType == "Defence" )
 				{
-					titan.GiveOffhandWeapon("mp_titanability_phase_dash", OFFHAND_ANTIRODEO, ["pas_ronin_autoshift"] )
+					titan.GiveOffhandWeapon("mp_titanability_phase_dash", OFFHAND_ANTIRODEO )
 					GivePassive( titan, ePassives.PAS_RONIN_AUTOSHIFT )
 				}
 				else if( passiveType == "Tactical" )
@@ -464,7 +464,7 @@ void function TitanReplace_BecomeRonin( entity titan, bool isPickup = false, boo
 				//Titan Core
 				if( passiveType == "Core" )
 				{
-					titan.GiveOffhandWeapon( "mp_titancore_shift_core", OFFHAND_EQUIPMENT, ["pas_ronin_swordcore"] )
+					titan.GiveOffhandWeapon( "mp_titancore_shift_core", OFFHAND_EQUIPMENT )
 					GivePassive( titan, ePassives.PAS_RONIN_SWORDCORE )
 				}
 				else
@@ -581,7 +581,7 @@ void function TitanReplace_BecomeNorthstar( entity titan, bool isPickup = false,
 
 				//Tacticals, northstar is a bit special
 				if( passiveType == "Core" )
-					titan.GiveOffhandWeapon("mp_titanability_hover", OFFHAND_ANTIRODEO, ["pas_northstar_flightcore"] )
+					titan.GiveOffhandWeapon("mp_titanability_hover", OFFHAND_ANTIRODEO )
 				else
 					titan.GiveOffhandWeapon("mp_titanability_hover", OFFHAND_ANTIRODEO)
 
@@ -597,7 +597,7 @@ void function TitanReplace_BecomeNorthstar( entity titan, bool isPickup = false,
 				//Titan Core
 				if( passiveType == "Core" )
 				{
-					titan.GiveOffhandWeapon( "mp_titancore_flight_core", OFFHAND_EQUIPMENT, ["pas_northstar_flightcore"] )
+					titan.GiveOffhandWeapon( "mp_titancore_flight_core", OFFHAND_EQUIPMENT )
 					GivePassive( titan, ePassives.PAS_NORTHSTAR_FLIGHTCORE )
 				}
 				else
@@ -832,7 +832,7 @@ void function TitanReplace_BecomeLegion( entity titan, bool isPickup = false, bo
 				//Defence
 				if( passiveType == "Defence" )
 				{
-					titan.GiveOffhandWeapon("mp_titanability_gun_shield", OFFHAND_SPECIAL, ["pas_legion_gunshield"] )
+					titan.GiveOffhandWeapon("mp_titanability_gun_shield", OFFHAND_SPECIAL )
 					GivePassive( titan, ePassives.PAS_LEGION_GUNSHIELD )
 				}
 				else
@@ -1092,7 +1092,7 @@ string function IonWeaponDisplayNameFunc( entity weapon )
 		coreMods = core.GetMods()
 
 	string displayName = "離子 技能組"
-	if ( SoulHasPassive( soul, ePassives.PAS_ION_WEAPON ) || primaryMods.contains( "pas_ion_weapon" ) )
+	if ( SoulHasPassive( soul, ePassives.PAS_ION_WEAPON ) )
 		displayName += "【纏結能量】"
 	else if ( antiRodeoMods.contains( "pas_ion_tripwire" ) )
 		displayName += "【零點絆線】"
@@ -1162,7 +1162,7 @@ string function ToneWeaponDisplayNameFunc( entity weapon )
 	string displayName = "強力 技能組"
 	if ( primaryMods.contains( "pas_tone_weapon" ) )
         displayName += "【強化追蹤彈藥】"
-	else if ( SoulHasPassive( soul, ePassives.PAS_TONE_WALL ) || specialMods.contains( "pas_tone_wall" ) )
+	else if ( SoulHasPassive( soul, ePassives.PAS_TONE_WALL ) )
 		displayName += "【強化粒子障壁】"
 	else if ( antiRodeoMods.contains( "pas_tone_sonar" ) )
 		displayName += "【脈衝回波】"
@@ -1239,9 +1239,9 @@ string function RoninWeaponDisplayNameFunc( entity weapon )
 		displayName += "【彈跳彈藥】"
 	else if ( ordnanceMods.contains( "pas_ronin_arcwave" ) )
 		displayName += "【雷暴】"
-	else if ( SoulHasPassive( soul, ePassives.PAS_RONIN_AUTOSHIFT ) || antiRodeoMods.contains( "pas_ronin_autoshift" ) )
+	else if ( SoulHasPassive( soul, ePassives.PAS_RONIN_AUTOSHIFT ) )
 		displayName += "【瞬間反應】"
-	else if ( SoulHasPassive( soul, ePassives.PAS_RONIN_SWORDCORE ) || coreMods.contains( "pas_ronin_swordcore" ) )
+	else if ( SoulHasPassive( soul, ePassives.PAS_RONIN_SWORDCORE ) )
 		displayName += "【高地戰士】"
 	else if ( antiRodeoMods.contains( "pas_ronin_phase" ) )
 		displayName += "【時間異常】"
@@ -1313,7 +1313,7 @@ string function NorthstarWeaponDisplayNameFunc( entity weapon )
 		displayName += "【強化負載重量】"
 	else if ( specialMods.contains( "pas_northstar_trap" ) )
 		displayName += "【雙重陷阱】"
-	else if ( SoulHasPassive( soul, ePassives.PAS_NORTHSTAR_FLIGHTCORE ) || coreMods.contains( "pas_northstar_flightcore" ) )
+	else if ( SoulHasPassive( soul, ePassives.PAS_NORTHSTAR_FLIGHTCORE ) )
 		displayName += "【毒蛇推進器】"
 	else if ( primaryMods.contains( "pas_northstar_optics" ) )
 		displayName += "【威脅光鏡】"
@@ -1473,7 +1473,7 @@ string function LegionWeaponDisplayNameFunc( entity weapon )
 		displayName += "【強化彈藥容量】"
 	else if ( coreMods.contains( "pas_legion_smartcore" ) )
 		displayName += "【感測器陣列】"
-	else if ( SoulHasPassive( soul, ePassives.PAS_LEGION_GUNSHIELD ) || specialMods.contains( "pas_legion_gunshield" ) )
+	else if ( SoulHasPassive( soul, ePassives.PAS_LEGION_GUNSHIELD ) )
 		displayName += "【堡壘】"
 	else if ( primaryMods.contains( "pas_legion_spinup" ) )
 		displayName += "【輕合金】"
@@ -1552,7 +1552,7 @@ string function MonarchWeaponDisplayNameFunc( entity weapon )
 	// mornach has variant mods
 	// passives
 	string passive = ""
-	if ( SoulHasPassive( soul, ePassives.PAS_VANGUARD_SHIELD ) || specialMods.contains( "pas_vanguard_shield" ) )
+	if ( SoulHasPassive( soul, ePassives.PAS_VANGUARD_SHIELD ) )
 		passive = "防護罩放大器"
 	else if ( SoulHasPassive( soul, ePassives.PAS_VANGUARD_COREMETER ) )
 		passive = "能量盜取"
