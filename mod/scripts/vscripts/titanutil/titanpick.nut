@@ -571,7 +571,7 @@ void function ReplaceTitanWeapon( entity player, entity weaponProp )
 
 bool function ShouldTitanPassUpgradesForPickUp( entity titan, entity weaponProp )
 {
-    if ( GetCurrentPlaylistVarInt( "monarch_upgrade_after_drop", 0 ) == "1" )
+    if ( GetCurrentPlaylistVarInt( "monarch_upgrade_after_drop", 0 ) == 1 )
         return true
 
     entity soul = titan.GetTitanSoul()
