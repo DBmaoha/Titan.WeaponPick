@@ -1,7 +1,9 @@
-untyped // almost everything is hardcoded in this file!
+// monarch hack really should be in callbacks such as AddCallback_TitanPickApplySavedOffhands()
+untyped
 
 global function TitanPick_Init
 
+// utilities
 global function TitanPick_SoulSetEnableWeaponDrop
 global function TitanPick_SoulSetEnableWeaponPick
 
@@ -17,6 +19,7 @@ global function TitanPick_AddChangableClassMod
 global function TitanPick_ShouldTitanDropWeapon
 global function TitanPick_TitanDropWeapon
 
+
 const float TITAN_WEAPON_DROP_LIFETIME          = 60 // after this time the weapon drop will be destroyed
 
 // consts that no need to change
@@ -24,7 +27,7 @@ const string TITAN_DROPPED_WEAPON_SCRIPTNAME    = "titanPickWeaponDrop"
 const vector DEFAULT_DROP_ORIGIN                = < -9999, -9999, -9999 > // hack, this means drop right under player or titan
 const vector DEFAULT_DROP_ANGLES                = < -9999, -9999, -9999 > // hack, this means drop right under player or titan
 
-const float PLAYER_PICKUP_COOLDOWN              = 0.2 // for we use this 0.2s to update core icon
+const float PLAYER_PICKUP_COOLDOWN              = 0.5 // for we use this 0.2s to update core icon
 const float PLAYER_RUI_UPDATE_DURATION          = 0.5 // use cinematic flag to update rui
 
 // monarch hack
@@ -107,13 +110,13 @@ struct OffhandWeaponData
     
     table<int, bool> passives = {} // should clone from soul.passives
     array<string> classMods = [] // requires modified titan_base.txt
-    int upgradeCount = 0 // monarch specific
+    int upgradeCount = 0 // monarch hack
 }
 
 struct
 {
     table<entity, float> playerPickupAllowedTime // for updating core icon
-    
+
     table<entity, bool> soulEnabledTitanDrop
     table<entity, bool> soulEnabledTitanPick
     table<entity, string> soulWeaponDropCharcterName // default classes registered in titan_replace.gnut
@@ -121,7 +124,7 @@ struct
     table<string, WeaponDropFunctions> registeredWeaponDrop
     table<entity, DroppedTitanWeapon> droppedWeaponPropsTable
     table<entity, OffhandWeaponData> droppedOffhandsTable
-     table<entity, entity> soulLoadoutOwnerSoul // for saving holding loadout's owner
+    table<entity, entity> soulLoadoutOwnerSoul // for saving holding loadout's owner
     table<entity, entity> droppedWeaponOwnerSoul
 
     // monarch hack
@@ -141,6 +144,7 @@ void function TitanPick_Init()
     AddCallback_OnNPCKilled( OnPlayerOrNPCKilled )
 
     // for updating rui
+    RegisterSignal( "UpdateCoreIcon" )
     RegisterSignal( "UpdateCockpitRUI" )
 }
 
@@ -283,6 +287,11 @@ entity function TitanPick_TitanDropWeapon( entity titan, vector droppoint = DEFA
     int camo = weapon.GetCamo()
     entity weaponProp = curDropFuncs.weaponPropFunc( weapon, droppoint, dropangle ) //CreatePropDynamic( modelname, droppoint, dropangle, SOLID_VPHYSICS )
     
+    if ( !IsValid( weaponProp ) ) // weird crash
+    {
+        //print( "weaponProp invalid!" )
+        return
+    }
     // loadout owner
     if ( !droppedByPickup ) // dropped by titan death
     {
@@ -329,8 +338,8 @@ entity function TitanPick_TitanDropWeapon( entity titan, vector droppoint = DEFA
 
     thread TitanWeaponDropLifeTime( weaponProp )
 
-    // destroy current weapon
-    weapon.Destroy()
+    // destroy current weapon.. may cause mod titan with other smart ammo offhand to get another main weapon on disembarking, cause crash!
+    //weapon.Destroy()
 
     return weaponProp
 }
@@ -370,12 +379,6 @@ array<string> function RemoveIllegalWeaponMods( array<string> mods )
     {
         if ( file.illegalWeaponMods.contains( mod ) ) // skip illegal mod
             continue
-        /*
-        if( mod == "Smart_Core" ||
-            mod == "rocketeer_ammo_swap" ||
-            mod == "LongRangeAmmo" )
-            continue
-        */
 
         replaceArray.append( mod )
     }
@@ -467,9 +470,10 @@ function PickupDroppedTitanWeapon( weaponProp, player )
     expect entity( player )
     expect entity( weaponProp )
 
+    //print( "RUNNING PickupDroppedTitanWeapon()" )
     if ( !IsValid( weaponProp ) )
         return
-
+    
     if ( file.playerPickupAllowedTime[ player ] > Time() ) // grace period
         return
 	
@@ -490,8 +494,8 @@ function PickupDroppedTitanWeapon( weaponProp, player )
 		SendHudMessage( player, "核心启动期间不可更换装备", -1, 0.3, 255, 255, 0, 0, 0, 3, 0 )
 		return
 	}
-    
-     entity newLoadoutOwner = file.droppedWeaponOwnerSoul[ weaponProp ]
+
+    entity newLoadoutOwner = file.droppedWeaponOwnerSoul[ weaponProp ]
     // monarch hack
     table<int, bool> newMonarchCorePassives = file.droppedMonarchCorePassives[ weaponProp ]
     // drop current weapon
@@ -501,7 +505,7 @@ function PickupDroppedTitanWeapon( weaponProp, player )
     // transfer passives table
     file.soulMonarchCorePassives[ soul ] = newMonarchCorePassives
     // replace loadout
-	ReplaceTitanWeapon( player, weaponProp )
+    ReplaceTitanWeapon( player, weaponProp )
 }
 
 // monarch hack
@@ -545,7 +549,7 @@ void function ReplaceTitanWeapon( entity player, entity weaponProp )
     // reset behaviors
     player.SetTitanDisembarkEnabled( true ) // do need to set up this since some weapon or titancore will disable it
 
-     // monarch hack: after being pick up, cannot upgrade anymore
+    // monarch hack: after being pick up, cannot upgrade anymore
     bool passUpgrades = ShouldTitanPassUpgradesForPickUp( player, weaponProp )
 
     // save cooldown
@@ -645,7 +649,7 @@ void function ApplySavedOffhandWeapons( entity titan, OffhandWeaponData savedOff
         soul.SetTitanSoulNetInt( "upgradeCount", savedOffhands.upgradeCount )
         //print( "new upgradeCount: "+ string( savedOffhands.upgradeCount ) )
         //print( "passUpgrades: " + string( passUpgrades ) )
-            
+
         if ( titan.IsPlayer() || IsPetTitan( titan ) )
         {
             entity player = titan.IsPlayer() ? titan : GetPetTitanOwner( titan )
@@ -779,10 +783,13 @@ string function GetMonarchFinalUpgradeName( entity titan )
 // rui updating
 void function UpdateCoreIconForLoadoutSwitch( entity player )
 {
-    file.playerPickupAllowedTime[ player ] = Time() + 0.2 // add a grace period for we update core icon
+    file.playerPickupAllowedTime[ player ] = Time() + PLAYER_PICKUP_COOLDOWN // add a grace period for we update core icon
     entity soul = player.GetTitanSoul()
     if ( IsValid( soul ) )
-        SoulTitanCore_SetExpireTime( soul, Time() + 0.2 ) // this will make core state become active, after that client will update icon
+    {
+        if ( IsValid( player.GetOffhandWeapon( OFFHAND_EQUIPMENT ) ) ) // anti crash... why?
+            SoulTitanCore_SetExpireTime( soul, Time() + 0.15 ) // this will make core state become active, after that client will update icon
+    }
 }
 
 void function UpdateCockpitRUIVisbilityForLoadoutSwitch( entity player )
