@@ -1934,3 +1934,18 @@ void function MeleeSyncedTitan_SetSoulUseExecutionCallback( entity titanSoul, bo
 ///////////////
 ///// END /////
 ///////////////
+
+// taken from _ai_pilots.gnut, required
+bool function TitanHasNpcPilot( entity titan )
+{
+	Assert( titan.IsTitan() )
+
+	entity titanSoul = titan.GetTitanSoul()
+	if ( !IsValid( titanSoul ) )
+		return false
+
+	if ( !titanSoul.soul.seatedNpcPilot.isValid )
+		return false
+
+	return true
+}
