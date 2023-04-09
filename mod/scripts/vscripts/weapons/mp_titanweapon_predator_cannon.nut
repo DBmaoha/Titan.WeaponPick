@@ -143,6 +143,7 @@ var function OnWeaponPrimaryAttack_titanweapon_predator_cannon( entity weapon, W
 		if ( IsValid( soul ) )
 		{
 			string titanType = GetSoulTitanSubClass( soul )
+			if ( titanType == "ogre" )
 			{
 				if ( owner.IsPlayer() && IsMultiplayer() )
 				{
