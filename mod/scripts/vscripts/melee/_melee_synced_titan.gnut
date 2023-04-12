@@ -1841,6 +1841,10 @@ void function ExecutedTitanDropWeapon_Threaded( entity titan )
 	weaponProp.NotSolid() // prevent it mess up execution
 	weaponProp.Hide()
 	weaponProp.UnsetUsable()
+	// don't drop weapon again for this soul
+	entity soul = titan.GetTitanSoul()
+	if ( IsValid( soul ) )
+		TitanPick_SoulSetEnableWeaponDrop( soul, false )
 
 	OnThreadEnd
 	(
@@ -1873,11 +1877,14 @@ void function ExecutedTitanDropWeapon_Threaded( entity titan )
 	// manually handle AE_DROP_WEAPON, wait for this weapon being dropped, then create a new one and drop it
 	while ( TitanHasWeaponEntity( titan, weaponToDrop ) )
 		WaitFrame()
+	
+	// AE_DROP_WEAPON triggered! re-enable weapon drop
+	if ( IsValid( soul ) )
+		TitanPick_SoulSetEnableWeaponDrop( soul, true )
 
 	if ( !TitanPick_ShouldTitanDropWeapon( titan ) )
 		return
 
-	//print( "Titan dropped weapon for being executed" )
 	// temp give a weapon
 	foreach ( entity weapon in titan.GetMainWeapons() )
 		titan.TakeWeapon( weapon.GetWeaponClassName() )
@@ -1892,7 +1899,6 @@ void function ExecutedTitanDropWeapon_Threaded( entity titan )
 	newWeapon.Destroy()
 
 	// don't drop weapon again for this soul
-	entity soul = titan.GetTitanSoul()
 	if ( IsValid( soul ) )
 		TitanPick_SoulSetEnableWeaponDrop( soul, false )
 }
