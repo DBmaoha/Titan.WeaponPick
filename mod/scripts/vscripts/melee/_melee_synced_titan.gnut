@@ -616,6 +616,12 @@ function MeleeThread_TitanRipsPilot( table e, SyncedMelee action, entity attacke
 		targetTitan.kv.VisibilityFlags = (ENTITY_VISIBLE_TO_FRIENDLY | ENTITY_VISIBLE_TO_ENEMY) //owner cant see
 		targetTitan.PlayerMelee_ExecutionStartTarget( attacker )
     	e.target <- target
+
+		// modified for titanpick!
+		// don't drop weapon on this titan. CreateAutoTitanForPlayer_ForTitanBecomesPilot() won't spawn a soul, so we get soul after player transfer their titanSoul(through TitanBecomesPilot) to this targetTitan
+		entity soul = targetTitan.GetTitanSoul()
+		if ( IsValid( soul ) )
+			TitanPick_SoulSetEnableWeaponDrop( soul, false )
 	}
 	else
 	{
